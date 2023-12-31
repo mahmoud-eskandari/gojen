@@ -2,7 +2,7 @@ vendor
 config.gojen.yaml
 models/*
 .vscode
-
+gojen
 
 # General
 .DS_Store
