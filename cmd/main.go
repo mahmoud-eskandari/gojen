@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/mahmoud-eskandari/goje"
 	"github.com/mahmoud-eskandari/gojen/internal/config"
@@ -15,9 +16,8 @@ import (
 
 func Execute() {
 	conf := flag.String("c", "config.gojen.yaml", "Set config path")
-	initCmd := flag.String("init", "", "initial config file")
 
-	if initCmd != nil {
+	if len(os.Args) > 1 && strings.ToLower(os.Args[1]) == "init" {
 		initConfig(*conf)
 		fmt.Println("Config file created successfully!")
 		fmt.Printf("Edit [%s] to set database connection and other options", *conf)

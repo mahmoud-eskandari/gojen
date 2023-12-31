@@ -13,12 +13,12 @@ var Conf Config
 func ReadConfig(path string) error {
 	file, err := os.OpenFile(path, os.O_RDONLY, fs.FileMode(os.O_RDONLY))
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = yaml.NewDecoder(file).Decode(&Conf)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return nil
