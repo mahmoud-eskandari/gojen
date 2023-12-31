@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mahmoud-eskandari/goje"
 	"github.com/mahmoud-eskandari/gojen/internal/config"
 	"github.com/mahmoud-eskandari/gojen/internal/generator"
 	"github.com/mahmoud-eskandari/gojen/internal/repo"
+	"github.com/mahmoud-eskandari/gojen/internal/version"
 )
 
 func Execute() {
@@ -24,7 +24,7 @@ func Execute() {
 	}
 
 	if len(os.Args) > 1 && strings.Contains(os.Args[1], "ersion") {
-		fmt.Printf("Gojen Ver(%s) developed by Mahmoud Eskandari.", goje.Version)
+		fmt.Printf("Gojen Ver(%s) developed by Mahmoud Eskandari.", version.Ver)
 		return
 	}
 
