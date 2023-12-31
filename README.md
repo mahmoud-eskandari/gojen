@@ -1,4 +1,4 @@
-# :tomato: Gojen
+# :tomato: Gojen **[Beta] Don't use in production**
 Lightweight SQL to struct generator / ORM toolkit for `Golang`
 
 `Default template uses `[Goje](https://github.com/mahmoud-eskandari/goje)` as a helper dependency.`
