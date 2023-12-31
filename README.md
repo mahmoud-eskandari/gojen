@@ -18,7 +18,7 @@ go install https://github.com/mahmoud-eskandari/gojen@latest
 ```
 
 ### Supported Databases
-- [x] MySQL &rarr;
+- [x] MySQL
 - [ ] PostgreSQL `in progress`
 
 
