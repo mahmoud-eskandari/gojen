@@ -6,7 +6,7 @@ Lightweight SQL to struct generator / ORM toolkit for `Golang`
 
 ## Steps
 1. Database &rarr; Go struct:
-	* init configs `gojen init`
+	* init configs `gojen init` or rename `config.gojen.yaml.sample` &rarr; `config.gojen.yaml`
 	* run `gojen` to build database models from target database
 
 2. Use generated Go structs in your project.
