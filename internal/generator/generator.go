@@ -2,6 +2,7 @@ package generator
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -34,6 +35,34 @@ func Generate() error {
 		"structTagExcept": structTagExcept,
 		"imports":         SetImports,
 		"join":            strings.Join,
+		"isPrimary": func(table string, colName string) bool {
+			for _, pk := range Tables[table].Primaries {
+				if pk.Name == colName {
+					return true
+				}
+			}
+			return false
+		},
+		"joinCols": func(cols []Column, template, delimiter string) string {
+			out := []string{}
+			for _, col := range cols {
+				if strings.Contains(template, "%") {
+					out = append(out, fmt.Sprintf(template, col.Name))
+				} else {
+					out = append(out, template)
+				}
+			}
+			return strings.Join(out, delimiter)
+		},
+		"joinCamelCols": func(cols []Column, template, delimiter string) string {
+			out := []string{}
+			for _, col := range cols {
+				if strings.Contains(template, "%") {
+					out = append(out, fmt.Sprintf(template, strcase.ToCamel(col.Name)))
+				}
+			}
+			return strings.Join(out, delimiter)
+		},
 		"singular": func(name string) string {
 			p := pluralize.NewClient()
 			return p.Singular(name)
@@ -44,8 +73,7 @@ func Generate() error {
 		"datetime": func() string {
 			return time.Now().Format(time.RFC1123)
 		},
-		"NonPrimaryCols":     NonPrimaryCols,
-		"NonPrimaryColsArgs": NonPrimaryColsArgs,
+		"NonPrimaryCols": NonPrimaryCols,
 		"pkg": func() string {
 			return config.Conf.Pkg
 		},

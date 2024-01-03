@@ -111,10 +111,9 @@ func (t *Table) GetIndexes() {
 		var indexName, columnName string
 		rows.Scan(&indexName, &columnName)
 		if indexName == "PRIMARY" {
-			t.Primary = columnName
 			for _, col := range t.Columns {
 				if col.Name == columnName {
-					t.PrimaryColType = col.GoDataType
+					t.Primaries = append(t.Primaries, col)
 					break
 				}
 			}
@@ -134,6 +133,11 @@ func (t *Table) GetIndexes() {
 				}
 			}
 		}
+	}
+
+	if len(t.Primaries) == 1 {
+		t.Primary = t.Primaries[0].Name
+		t.PrimaryColType = t.Primaries[0].GoDataType
 	}
 }
 

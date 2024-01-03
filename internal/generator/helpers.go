@@ -77,21 +77,11 @@ func SetImports(imports []string) string {
 	return out
 }
 
-func NonPrimaryCols(t Table) []string {
-	out := []string{}
+func NonPrimaryCols(t Table) []Column {
+	out := []Column{}
 	for _, col := range t.Columns {
-		if col.Name != t.Primary {
-			out = append(out, col.Name)
-		}
-	}
-	return out
-}
-
-func NonPrimaryColsArgs(t Table) []string {
-	out := []string{}
-	for _, col := range t.Columns {
-		if col.Name != t.Primary {
-			out = append(out, "?")
+		if COlContains(t.Primaries, col) < 0 {
+			out = append(out, col)
 		}
 	}
 	return out
@@ -101,6 +91,16 @@ func (t *Table) Prepare() {
 	if t.PrimaryColType == "string" {
 		t.Imports = append(t.Imports, "strconv")
 	}
+}
+
+// COlContains check heyStack contains needle and return needle`s position
+func COlContains(heyStack []Column, needle Column) int {
+	for i, item := range heyStack {
+		if item.Name == needle.Name {
+			return i
+		}
+	}
+	return -1
 }
 
 // StringContains check heyStack contains needle and return needle`s position

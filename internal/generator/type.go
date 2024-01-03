@@ -9,9 +9,11 @@ type Table struct {
 	LRelations []Relation
 	RRelations []Relation
 
-	UniqIndexes    map[string][]Column
+	UniqIndexes map[string][]Column
+
 	Primary        string
 	PrimaryColType string
+	Primaries      []Column
 }
 
 type Column struct {
