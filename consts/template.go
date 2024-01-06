@@ -66,7 +66,7 @@ func (opt {{.SingularName}}) GetCtx() *goje.Context {
 }
 
 //SetCtx set context handler for current object
-func (opt {{.SingularName}}) SetCtx(ctx *goje.Context) {
+func (opt *{{.SingularName}}) SetCtx(ctx *goje.Context) {
 	opt.ctx = ctx
 }
 
@@ -193,7 +193,13 @@ func (opt *{{.SingularName}}) Save(handler *goje.Context) error {
 
 //Insert create an entry
 func (opt *{{.SingularName}}) Insert(handler *goje.Context) error {
-
+	if handler == nil {
+		handler = opt.ctx
+	}
+	if handler == nil {
+		return goje.ErrHandlerIsNil
+	}
+	
 	if BeforeInsert{{.SingularName}} != nil {
 		err := BeforeInsert{{.SingularName}}(handler, opt)
 		if err != nil {
