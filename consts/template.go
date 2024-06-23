@@ -13,24 +13,22 @@ import(
 )
 
 type {{.SingularName}} struct{
-	{{range .Columns}}{{ if eq $.Primary .Name }}//Primary Key{{end}}{{if and (eq .DataType "enum") (eq .Nullable 0)}}
+	{{range .Columns}}{{ if eq $.Primary .Name }}
+	//Primary Key{{end}}{{if and (eq .DataType "enum") (eq .Nullable 0)}}
+
 	//{{camel .Name}}: Enum acceptable values({{join .Enum ","}}){{end}}
 	{{camel .Name}} 	{{if and (eq .DataType "enum") (eq .Nullable 0)}}{{$.SingularName}}{{camel .Name}}{{else}}{{.GoDataType}}{{end}} 	{{structTag .Name}}{{end}}
-	
 	{{range .LRelations}}
-	//relation one to one, {{camel .Table.Name}} [{{.FromCol}} -> {{.ToCol}}]
+	//relation one to one, {{camel .Table.Name}} [{{.FromCol}} -> {{.Table.Name}}.{{.ToCol}}]
 	{{camel .FromCol}}{{camel (singular .RefTable)}} *{{.Table.SingularName}} {{structTagExcept ( (print .FromCol "_" (singular .Table.Name)) ) "db"}}{{end}}
-
 	{{range .RRelations}}
 	//relation one to many {{camel .RefTable}} [{{.FromCol}} -> {{.ToCol}}]
 	{{camel .RefTable}}By{{camel .FromCol}}Rel *[]{{camel (singular .RefTable)}} {{structTagExcept (print .RefTable "_by_" .FromCol)  "db"}}{{end}}
-
 	//internal context, db handler
 	ctx		*goje.Context {{structTag "-"}}
 	parent  goje.Entity {{structTag "-"}}
 }
 
-type {{.SingularName}}List []{{.SingularName}}
 var BeforeInsert{{.SingularName}} func(*goje.Context, *{{.SingularName}}) error
 var BeforeUpdate{{.SingularName}} func(*goje.Context, *{{.SingularName}}) error
 var BeforeDelete{{.SingularName}} func(*goje.Context, *{{.SingularName}}) error
@@ -130,46 +128,6 @@ func (opt *{{.SingularName}}) Delete(handler *goje.Context) error {
 
 }
 
-//Delete multipe entities
-func (opts *{{.SingularName}}List) DeleteAll(handler *goje.Context) error {
-	if opts == nil || len(*opts) == 0{
-		return nil
-	}
-
-	if handler == nil {
-		return goje.ErrHandlerIsNil
-	}
-
-	var {{camel .Primary }}List []interface{}
-
-	for _, opt := range *opts{
-		if BeforeDelete{{.SingularName}} != nil {
-			err := BeforeDelete{{.SingularName}}(handler, &opt)
-			if err != nil {
-				return err
-			}
-		}
-		{{camel .Primary }}List = append({{camel .Primary }}List, opt.{{camel .Primary }})
-	}
-
-	args := strings.Repeat(",?", len({{camel .Primary }}List))
-	args = args[1:]
-	_, err := handler.DB.ExecContext(handler.Ctx, "DELETE FROM {{.Name}} WHERE {{.Primary }} IN ("+ args +")", {{camel .Primary }}List...)
-	if err != nil {
-		return err
-	}
-
-	if AfterDelete{{.SingularName}} != nil {
-		for _, opt := range *opts{
-			AfterDelete{{.SingularName}}(handler, &opt)
-		}
-		
-	}
-
-	return nil
-
-}
-{{end}}
 //Save update an entry when primary key is set or create an entry when primary key isn't set
 func (opt *{{.SingularName}}) Save(handler *goje.Context) error {
 	if handler == nil {
@@ -266,8 +224,10 @@ func (opt *{{.SingularName}}) Update(handler *goje.Context) error {
 	{{end}}
 }
 
+{{if .Primaries}}
 //Get{{.SingularName}}By{{joinCamelCols .Primaries "%s" ","}} get one object of {{.SingularName}} by primary keys
 func Get{{.SingularName}}By{{joinCamelCols .Primaries "%s" "And"}}(handler *goje.Context, {{joinCamelCols .Primaries "%s" ","}} interface{}) (*{{.SingularName}}, error) {
+
 	if handler == nil {
 		return nil, goje.ErrHandlerIsNil
 	}
@@ -283,16 +243,17 @@ func Get{{.SingularName}}By{{joinCamelCols .Primaries "%s" "And"}}(handler *goje
 	row.Scan({{range $ir,$col := .Columns}}{{if ne $ir 0}},{{end}}&out.{{camel $col.Name}}{{end}})
 	return &out,nil
 }
+{{end}}
 
 {{range $indexName,$cols := .UniqIndexes}}
 {{if ne $indexName "PRIMARY"}}
 //Get data attention by {{$indexName}} index
-func Get{{$.SingularName}}By{{joinCamelCols $cols "%s" "And"}}(handler *goje.Context, {{joinCamelCols $cols "%s interface{}" ","}}) (*{{$.SingularName}}, error) {
+func Get{{$.SingularName}}By{{joinCamelCols $cols "%s" "And"}}(handler *goje.Context, {{joinCamelCols $cols "%sArg interface{}" ","}}) (*{{$.SingularName}}, error) {
 	if handler == nil {
 		return nil, goje.ErrHandlerIsNil
 	}
 
-	row := handler.DB.QueryRowContext(handler.Ctx, "SELECT {{range $ir,$col := $.Columns}}{{if ne $ir 0}},{{end}}{{$col.Name}}{{end}} FROM {{$.Name}} WHERE {{range $ic,$col := $cols}}{{if ne $ic 0}} AND {{end}}{{$col.Name}}=?{{end}}"{{range $cols}}, {{camel .Name}}{{end}})
+	row := handler.DB.QueryRowContext(handler.Ctx, "SELECT {{range $ir,$col := $.Columns}}{{if ne $ir 0}},{{end}}{{$col.Name}}{{end}} FROM {{$.Name}} WHERE {{range $ic,$col := $cols}}{{if ne $ic 0}} AND {{end}}{{$col.Name}}=?{{end}}"{{range $cols}}, {{camel .Name}}Arg{{end}})
 
 	if row.Err() != nil {
 		return nil, row.Err()
