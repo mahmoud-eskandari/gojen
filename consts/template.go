@@ -338,8 +338,8 @@ func (opt *{{$.SingularName}}) Load{{camel .FromCol}}{{camel (singular .RefTable
 		return err
 	}
 
-	if len(*rows) > 0{
-		obj := (*rows)[0]
+	if len(rows) > 0{
+		obj := rows[0]
 		obj.parent = *opt
 		opt.{{camel .FromCol}}{{camel (singular .RefTable)}} =  &obj
 	}
