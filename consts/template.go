@@ -367,9 +367,9 @@ func (opt *{{$.SingularName}}) Load{{camel .RefTable}}By{{camel .FromCol}}(Queri
 		return err
 	}
 
-	rowsWithParent := make([]{{camel (singular .RefTable)}}, len(*rows))
-	for i := 0; i < len(*rows); i++ {
-		obj := (*rows)[i]
+	rowsWithParent := make([]{{camel (singular .RefTable)}}, len(rows))
+	for i := 0; i < len(rows); i++ {
+		obj := rows[i]
 		obj.parent = *opt
 		rowsWithParent[i] =  obj
 	}

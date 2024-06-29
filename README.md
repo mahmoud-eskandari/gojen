@@ -14,7 +14,7 @@ Lightweight SQL to struct generator / ORM toolkit for `Golang`
 ## Install Gojen (Generator command line tool)
 
 ``` Bash
-go install github.com/mahmoud-eskandari/gojen@v0.0.11
+go install github.com/mahmoud-eskandari/gojen@v0.1.0
 ```
 
 ### Supported Databases
