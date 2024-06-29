@@ -280,11 +280,11 @@ func Get{{camel .Name}}(handler *goje.Context, Queries ...goje.QueryInterface) (
 	}
 
 	rows, err := handler.DB.QueryContext(handler.Ctx,query ,args...)
-
-	defer func() { _ = rows.Close() }()
 	if err != nil {
 		return nil, err
 	}
+
+	defer func() { _ = rows.Close() }()
 	
 	var out []{{.SingularName}}
 	for rows.Next(){
