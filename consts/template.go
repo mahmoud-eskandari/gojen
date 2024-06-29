@@ -269,7 +269,7 @@ func Get{{$.SingularName}}By{{joinCamelCols $cols "%s" "And"}}(handler *goje.Con
 {{end}}
 
 //Get{{camel .Name}} Get list of entities by query
-func Get{{camel .Name}}(handler *goje.Context, Queries ...goje.QueryInterface) (*[]{{.SingularName}}, error) {
+func Get{{camel .Name}}(handler *goje.Context, Queries ...goje.QueryInterface) ([]{{.SingularName}}, error) {
 	if handler == nil {
 		return nil, goje.ErrHandlerIsNil
 	}
@@ -293,7 +293,7 @@ func Get{{camel .Name}}(handler *goje.Context, Queries ...goje.QueryInterface) (
 		rows.Scan({{range $ir,$col := .Columns}}{{if ne $ir 0}},{{end}}&c.{{camel $col.Name}}{{end}})
 		out = append(out, c)
 	}
-	return &out, nil
+	return out, nil
 }
 
 //Count{{camel .Name}} count list of entities
