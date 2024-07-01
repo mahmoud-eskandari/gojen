@@ -1,8 +1,10 @@
 package generator
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"go/format"
 	"log"
 	"os"
 	"os/exec"
@@ -91,21 +93,35 @@ func Generate() error {
 	Tables = GetTables()
 	for _, table := range Tables {
 		filepath := path.Join(config.Conf.Dir, table.Name+".generated.go")
+		if !config.Conf.Replace {
+			_, err := os.Stat(filepath)
+			if err == nil {
+				log.Printf("[%s] regenerate ignored because `replace` is disabled in config", filepath)
+				continue
+			}
+		}
+
 		os.Remove(filepath)
 		file, err := os.Create(filepath)
 		if err != nil {
 			panic(err)
 		}
+
+		var out []byte
+		buf := bytes.NewBuffer(out)
+
 		table.Prepare()
-		err = t1.Execute(file, table)
+		err = t1.Execute(buf, table)
 		if err != nil {
 			log.Print(exec.ErrDot)
+			file.Close()
+			continue
 		}
+
+		out, _ = format.Source(out)
+		file.Write(out)
 		file.Close()
 	}
-
-	//go fmt directory
-	exec.Command("go", "fmt", config.Conf.Dir).Run()
 
 	return nil
 }
