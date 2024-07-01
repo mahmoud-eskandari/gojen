@@ -14,7 +14,7 @@ Lightweight SQL to struct generator / ORM toolkit for `Golang`
 ## Install Gojen (Generator command line tool)
 
 ``` Bash
-go install github.com/mahmoud-eskandari/gojen@v0.1.0
+go install github.com/mahmoud-eskandari/gojen@v0.1.1
 ```
 
 ### Supported Databases
@@ -39,7 +39,7 @@ import (
 
 func init(){
 	//init a database connection
-	err := goje.ConnectDB(&goje.DBConfig{
+	err := goje.InitDB(&goje.DBConfig{
 		Driver:      "mysql",
 		Host:        "127.0.0.1",
 		Port:        3306,
