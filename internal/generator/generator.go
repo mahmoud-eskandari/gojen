@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"go/format"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -107,8 +108,7 @@ func Generate() error {
 			panic(err)
 		}
 
-		var out []byte
-		buf := bytes.NewBuffer(out)
+		buf := bytes.NewBuffer(nil)
 
 		table.Prepare()
 		err = t1.Execute(buf, table)
@@ -118,7 +118,20 @@ func Generate() error {
 			continue
 		}
 
-		out, _ = format.Source(out)
+		out, err := io.ReadAll(buf)
+		if err != nil {
+			log.Print(err)
+			file.Close()
+			continue
+		}
+
+		out, err = format.Source(out)
+		if err != nil {
+			log.Print(err)
+			file.Close()
+			continue
+		}
+
 		file.Write(out)
 		file.Close()
 	}

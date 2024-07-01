@@ -1,6 +1,6 @@
 vendor
 config.gojen.yaml
-models/*
+models
 .vscode
 gojen
 
